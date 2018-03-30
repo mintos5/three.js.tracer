@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js.Tracer</title>
+    <style>
+        body {
+            font-family: Monospace;
+            background-color: #ffffff;
+            color: #fff;
+            margin: 0px;
+            overflow: hidden;
+        }
+    </style>
+
+</head>
+<body>
+    <script src="js/three.min.js"></script>
+    <script src="js/stats.min.js"></script>
+
+    <script src="js/lines/LineSegmentsGeometry.js"></script>
+    <script src="js/lines/LineGeometry.js"></script>
+    <script src="js/lines/WireframeGeometry2.js"></script>
+
+    <script src="js/lines/LineMaterial.js"></script>
+
+    <script src="js/lines/LineSegments2.js"></script>
+    <script src="js/lines/Line2.js"></script>
+    <script src="js/lines/Wireframe.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/lineGenerator.js"></script>
+
+    <script>
+        var main = new Main();
+        main.init();
+        main.animate();
+    </script>
+</body>
+</html>
