@@ -52,9 +52,11 @@ Main.prototype.init = function () {
 
 
     //create lineGenerator
-    this.lineGenerator.generateLine(0,0,48.143889,17.109722);
+    //this.lineGenerator.generateLine(0,0,48.143889,17.109722);
 
     this.camera.position.z = 40;
+
+    loadData();
 };
 
 Main.prototype.animate = function () {
