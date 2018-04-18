@@ -1,8 +1,14 @@
 var tracesCount = 0;
 var realPoints;
 var points;
-function readData(url,color,text) {
-    var coord = [];
+function readData(url,text) {
+    var newPath = {name: text,
+        addresses: []};
+    //same name path exists, add random number to the end of the name
+    if (text in paths === true) {
+        text += Math.random().toString(36).substring(7);
+    }
+    paths[text] = newPath;
     var last = -1;
     Papa.parse(url, {
         download: true,
@@ -19,35 +25,60 @@ function readData(url,color,text) {
                 //console.log("wrong number " + row.data[0][4] + " " + row.data[0][5]);
                 return;
             }
-            //same data
+            //same data testing, something must be last
             if (last >= 0){
-                if (row.data[0][4] == coord[last].lat || row.data[0][5] == coord[last].lng) {
+                if (row.data[0][4] == newPath.addresses[last].lat || row.data[0][5] == newPath.addresses[last].lng) {
                     //console.log("duplicity value");
                     points++;
                     return;
                 }
             }
-            var point = {lat: Number(row.data[0][4]), lng: Number(row.data[0][5])};
-            coord.push(point);
+
+            var newAddress = {};
+            newAddress.seq = row.data[0][0];
+            newAddress.name = row.data[0][1];
+            newAddress.ip = row.data[0][2];
+            newAddress.time = row.data[0][3];
+            newAddress.lat = row.data[0][4];
+            newAddress.lng = row.data[0][5];
+            //push information to new forming path
+            newPath.addresses.push(newAddress);
+            //push pointer to hashTable
+            if (newAddress.ip in addresses === false) {
+                addresses[newAddress.ip] = [];
+            }
+            addresses[newAddress.ip].push(newPath);
+            //push pointer to GEO hashtable
+            if (newAddress.lat+newAddress.lng in geos === false) {
+                geos[newAddress.lat+newAddress.lng] = [];
+            }
+            geos[newAddress.lat+newAddress.lng] = newPath;
+
             last++;
             realPoints++;
             points++;
         },
         complete: function () {
-            console.log("trace finished: "+ last);
-            //console.log(coord);
+            console.log("path loaded: "+ last);
+            console.log(newPath.addresses);
             //console.log("wau");
-            main.lineGenerator.generateLines(coord,color);
+            main.lineGenerator.generateLines(newPath,0xff0000, false, false);
         }
     });
 }
 
-function loadData() {
+
+function loadDataFromBrowser() {
+    //todo maybe??
+}
+
+function loadDataFromServer() {
     //Argentina
     tracesCount = tracesCount+20;
-    for (var i =1; i<=20;i++) {
-        readData("data/Argentina/Argentina" + i + ".csv",0xff0000,"Argentina");
+    for (var i =1; i<=1;i++) {
+        readData("data/Argentina/Argentina" + i + ".csv","Argentina"+ i + ".csv");
     }
+    /*
     //Arizona
     tracesCount = tracesCount+20;
     for (var i =1; i<=20;i++) {
@@ -78,7 +109,7 @@ function loadData() {
     for (var i =1; i<=20;i++) {
         readData("data/CanadaE/CanadaE" + i + ".csv",0x000000,"Canada");
     }
-    /*//Chile
+    //Chile
     color = document.getElementById('ChileColor').value;
     markerEnable = document.getElementById('ChileMarker').checked;
     countryEnable = document.getElementById('Chile').checked;

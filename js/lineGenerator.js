@@ -15,9 +15,20 @@ function LineGenerator(radius, scene) {
     this.raycaster = new THREE.Raycaster();
 }
 
+LineGenerator.prototype.removeAll = function () {
+
+};
+
+LineGenerator.prototype.removeLine = function (lineName) {
+
+};
+
 LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color) {
+
+    //todo add path name to the line and test for points and text
+
     // var dotGeometry = new THREE.Geometry();
-    // dotGeometry.vertices.push(positionOnSphere(lat,lon,this.sphereRadius));
+    // dotGeometry.vertices.push(positionOnSphere(lat1,lon1,this.sphereRadius));
     // var dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false } );
     // var dot = new THREE.Points( dotGeometry, dotMaterial );
     // this.scene.add( dot );
@@ -28,6 +39,8 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color) 
     //create curve to get center of the line
     var calculateCurve = new THREE.LineCurve3(startPosition,endPosition);
     var middlePosition = calculateCurve.getPoint(0.5);
+    console.log(middlePosition);
+    var traceLenght = calculateCurve.getLength();
 
     //find position of centre on sphere with raycasting
     this.raycaster = new THREE.Raycaster();
@@ -35,10 +48,10 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color) 
     var intersects = this.raycaster.intersectObject(this.scene,false);
     if (intersects.length > 0) {
         //position on sphere of the center of line
-        middlePosition.copy(intersects[0].point);
+        middlePosition.copy(this.scene.worldToLocal(intersects[0].point));
         //move it litle above sphere
         var moveVector = new THREE.Vector3().copy(middlePosition);
-        moveVector.normalize().multiplyScalar(10);
+        moveVector.normalize().multiplyScalar(0.8*traceLenght);
         middlePosition.add(moveVector);
     }
     var curve = new THREE.QuadraticBezierCurve3(
@@ -49,35 +62,6 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color) 
     //CREATE THE LINE
     //get three.js like
     var points = curve.getPoints( 18 );
-    /*
-    var color = new THREE.Color( 0xff0000 );
-
-
-    var pointsArray = [];
-    var colors = [];
-
-    for (var i =0; i < points.length; i++) {
-        pointsArray.push(points[i].x,points[i].y,points[i].z);
-        colors.push(color.r,color.g,color.b);
-    }
-
-    var geometryL = new THREE.LineGeometry();
-    geometryL.setPositions( pointsArray );
-    geometryL.setColors(colors);
-
-    var materialL = new THREE.LineMaterial( {
-        color: 0xffffff,
-        linewidth: 1, // in pixels
-        vertexColors: THREE.VertexColors,
-        //resolution:  // to be set by renderer, eventually
-        dashed: false
-    }  );
-    materialL.resolution.set( window.innerWidth, window.innerHeight );
-
-    var curveObject = new THREE.Line2( geometryL, materialL );
-    curveObject.computeLineDistances();
-    curveObject.scale.set( 1, 1, 1 );
-    this.scene.add(curveObject);*/
 
     var geometryL = new THREE.BufferGeometry().setFromPoints( points );
 
@@ -88,11 +72,11 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color) 
     //NOTICE that objects are added to sphere and not to scene, maybe i the furure we will need update positions
 };
 
-LineGenerator.prototype.generateLines = function (array, color) {
-    for (var i = 0; i < array.length-1; i++) {
+LineGenerator.prototype.generateLines = function (path, color, text, point) {
+    for (var i = 0; i < path.addresses.length-1; i++) {
 
-        console.log(array[i]);
         //console.log(array[i]);
-        this.generateLine(array[i].lat,array[i].lng,array[i+1].lat,array[i+1].lng,color);
+        this.generateLine(Number(path.addresses[i].lat),Number(path.addresses[i].lng),
+            Number(path.addresses[i+1].lat),Number(path.addresses[i+1].lng),color);
     }
 };
