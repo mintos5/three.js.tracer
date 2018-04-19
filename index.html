@@ -16,7 +16,9 @@
             right: 0px;
             top: 0px;
             width: 30%;
-            height: 100%;
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
 
             background: gray;
         }
@@ -31,21 +33,15 @@
     <link rel="stylesheet" href="js/choices/choices.min.css">
     <!-- Include Choices JavaScript -->
     <script src="js/choices/choices.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/controller.js"></script>
     <script src="js/lineGenerator.js"></script>
     <script src="js/loader.js"></script>
-
-    <script>
-        var main = new Main();
-        main.init();
-        main.animate();
-
-    </script>
+    <script src="js/main.js"></script>
 
     <div id="select">
         <div id="buttonCorrect" style="text-align: center; margin-top: 10px">
-            <button id="selectAll">Select All</button>
-            <button id="unSelectALl">Unselect all</button>
+            <button id="selectAll" onclick="main.controller.addAll()">Select All</button>
+            <button id="unSelectALl" onclick="main.controller.removeAll(true)">Unselect all</button>
         </div>
         <h3>Paths</h3>
         <select id="choicesPaths" multiple></select>
@@ -58,200 +54,33 @@
 
 
         <div id="checkBoxCorrect" style="text-align: center">
-            <input type="checkbox" name="vehicle1" value="ip">clustering
-            <input type="checkbox" name="vehicle2" value="Car">grouping
+            <input id="clusteringCheckBox" type="checkbox" name="clustering">clustering
+            <input id="groupingCheckBox" type="checkbox" name="grouping" onclick="main.controller.removeAll(true)">grouping
         </div>
         <hr>
 
-        <div id="pathsCorrect" style="overflow-y: scroll; height: 30%">
-            <label for="AllMap">Enable all</label>
-            <input id="AllColor" class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input id="AllMarker" class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input id="AllMap" class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
+        <div id="pathsCorrect">
+            <input type="checkbox" name="Enable Marker" onclick="main.controller.modifyLine('',true)">TEXT<input type="checkbox"  onclick="main.controller.modifyLine('',true)">POINT<input type="color" value="#ffffff" oninput="main.controller.modifyLine('',true)">
+            <label>Enable all</label>
             <br>
-            <label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br>
-            <label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br>
-            <label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br>
-            <label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br>
-            vv<label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br><label for="AllMap">Enable all</label>
-            <input  class="colorInput" type="color" value="#ffffff" oninput="allColorClicked()">
-            <input  class="markerCheckBox" type="checkbox" name="Enable Marker" onclick="allMarkerClicked()">
-            TEXT
-            <input  class="mapCheckBox" type="checkbox"  onclick="allMapClicked()">
-            POINT
-            <br>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         </div>
 
-        <form id="testForm" onsubmit="return funcForm()">
-            <input type="checkbox" name="vehicle1" value="ip">Some IP address<br>
-            <input type="checkbox" name="vehicle2" value="Car">Another IP address<br>
-            <input type="submit" value="Submit">
-        </form>
+        <!--<form id="testForm" onsubmit="return funcForm()">-->
+            <!--<input type="checkbox" name="vehicle1" value="ip">Some IP address<br>-->
+            <!--<input type="checkbox" name="vehicle2" value="Car">Another IP address<br>-->
+            <!--<input type="submit" value="Submit">-->
+        <!--</form>-->
 
     </div>
+
+
+    <script>
+        var main = new Main();
+        main.init();
+        main.animate();
+
+    </script>
 
     <script>
     function funcForm() {
@@ -263,93 +92,6 @@
 
         return false;
     }
-
-    /* Use label on event */
-    var choicesSelect = new Choices('#choicesPaths', {
-        removeItemButton: true,
-        choices: [
-            { value: 'One', label: 'Label One' },
-            { value: 'Two', label: 'Label Two', disabled: true },
-            { value: 'Three', label: 'Label Three' },
-            { value: 'One1', label: 'Label One1' },
-            { value: 'Two1', label: 'Label Two1', disabled: true },
-            { value: 'Three1', label: 'Label Three1' },
-            { value: 'One2', label: 'Label One2' },
-            { value: 'Two2', label: 'Label Two2', disabled: true },
-            { value: 'Three2', label: 'Label Three2' },
-            { value: 'One3', label: 'Label One3' },
-            { value: 'Two3', label: 'Label Two3', disabled: true },
-            { value: 'Three3', label: 'Label Three3' },
-            { value: 'One4', label: 'Label One4' },
-            { value: 'Two4', label: 'Label Two4', disabled: true },
-            { value: 'Three4', label: 'Label Three4' },
-        ],
-    }).setChoices([
-        { value: 'Four', label: 'Label Four', disabled: true },
-        { value: 'Five', label: 'Label Five' },
-        { value: 'Six', label: 'Label Six', selected: true },
-    ], 'value', 'label', false);
-
-    choicesSelect.passedElement.addEventListener('addItem', function(event) {
-        document.getElementById('message').innerHTML = 'You just added "' + event.detail.label + '"';
-    });
-
-    choicesSelect.passedElement.addEventListener('removeItem', function(event) {
-        document.getElementById('message').innerHTML = 'You just removed "' + event.detail.label + '"';
-    });
-
-
-    /* Use label on event */
-    var choicesSelect2 = new Choices('#choicesIps', {
-        removeItemButton: true,
-        choices: [
-            { value: 'One', label: 'Label One' },
-            { value: 'Two', label: 'Label Two', disabled: true },
-            { value: 'Three', label: 'Label Three' },
-            { value: 'One1', label: 'Label One1' },
-            { value: 'Two1', label: 'Label Two1', disabled: true },
-            { value: 'Three1', label: 'Label Three1' },
-            { value: 'One2', label: 'Label One2' },
-            { value: 'Two2', label: 'Label Two2', disabled: true },
-            { value: 'Three2', label: 'Label Three2' },
-            { value: 'One3', label: 'Label One3' },
-            { value: 'Two3', label: 'Label Two3', disabled: true },
-            { value: 'Three3', label: 'Label Three3' },
-            { value: 'One4', label: 'Label One4' },
-            { value: 'Two4', label: 'Label Two4', disabled: true },
-            { value: 'Three4', label: 'Label Three4' },
-        ],
-    }).setChoices([
-        { value: 'Four', label: 'Label Four', disabled: true },
-        { value: 'Five', label: 'Label Five' },
-        { value: 'Six', label: 'Label Six', selected: true },
-    ], 'value', 'label', false);
-
-    /* Use label on event */
-    var choicesSelect3 = new Choices('#choicesGeos', {
-        removeItemButton: true,
-        choices: [
-            { value: 'One', label: 'Label One' },
-            { value: 'Two', label: 'Label Two', disabled: true },
-            { value: 'Three', label: 'Label Three' },
-            { value: 'One1', label: 'Label One1' },
-            { value: 'Two1', label: 'Label Two1', disabled: true },
-            { value: 'Three1', label: 'Label Three1' },
-            { value: 'One2', label: 'Label One2' },
-            { value: 'Two2', label: 'Label Two2', disabled: true },
-            { value: 'Three2', label: 'Label Three2' },
-            { value: 'One3', label: 'Label One3' },
-            { value: 'Two3', label: 'Label Two3', disabled: true },
-            { value: 'Three3', label: 'Label Three3' },
-            { value: 'One4', label: 'Label One4' },
-            { value: 'Two4', label: 'Label Two4', disabled: true },
-            { value: 'Three4', label: 'Label Three4' },
-        ],
-    }).setChoices([
-        { value: 'Four', label: 'Label Four', disabled: true },
-        { value: 'Five', label: 'Label Five' },
-        { value: 'Six', label: 'Label Six', selected: true },
-    ], 'value', 'label', false);
 
     </script>
 </body>

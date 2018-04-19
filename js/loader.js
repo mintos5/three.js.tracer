@@ -1,9 +1,11 @@
 var tracesCount = 0;
+var tracesCounter = 0;
 var realPoints;
 var points;
-function readData(url,text) {
+function readData(url,text,group) {
     var newPath = {name: text,
-        addresses: []};
+        addresses: [],
+        group: group};
     //same name path exists, add random number to the end of the name
     if (text in paths === true) {
         text += Math.random().toString(36).substring(7);
@@ -50,9 +52,9 @@ function readData(url,text) {
             addresses[newAddress.ip].push(newPath);
             //push pointer to GEO hashtable
             if (newAddress.lat+newAddress.lng in geos === false) {
-                geos[newAddress.lat+newAddress.lng] = [];
+                geos[newAddress.lat+newAddress.lng] = {array: [], lat: newAddress.lat, lng: newAddress.lng};
             }
-            geos[newAddress.lat+newAddress.lng] = newPath;
+            geos[newAddress.lat+newAddress.lng].array.push(newPath);
 
             last++;
             realPoints++;
@@ -60,9 +62,14 @@ function readData(url,text) {
         },
         complete: function () {
             console.log("path loaded: "+ last);
-            console.log(newPath.addresses);
+            tracesCounter++;
+            //console.log(newPath.addresses);
             //console.log("wau");
-            main.lineGenerator.generateLines(newPath,0xff0000, false, false);
+            //main.lineGenerator.generateLines(newPath,0xff0000, false, false);
+            if (tracesCounter == tracesCount) {
+                console.log("WHAAT");
+                main.controller.loadChoices();
+            }
         }
     });
 }
@@ -75,8 +82,8 @@ function loadDataFromBrowser() {
 function loadDataFromServer() {
     //Argentina
     tracesCount = tracesCount+20;
-    for (var i =1; i<=1;i++) {
-        readData("data/Argentina/Argentina" + i + ".csv","Argentina"+ i + ".csv");
+    for (var i =1; i<=20;i++) {
+        readData("data/Argentina/Argentina" + i + ".csv","Argentina"+ i + ".csv","Argentina");
     }
     /*
     //Arizona

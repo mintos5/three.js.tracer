@@ -13,33 +13,65 @@ function LineGenerator(radius, scene) {
     this.sphereRadius = radius;
     this.scene = scene;
     this.raycaster = new THREE.Raycaster();
+    this.points = {};
+    this.groups = {};
 }
 
 LineGenerator.prototype.removeAll = function () {
-
+    while (this.scene.children.length)
+    {
+        this.scene.remove(this.scene.children[0]);
+    }
+    this.groups = {};
+    this.points = {};
 };
 
-LineGenerator.prototype.removeLine = function (lineName) {
-
+LineGenerator.prototype.removeLine = function (pathName) {
+    this.scene.remove(this.scene.getObjectByName(pathName));
 };
 
-LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color) {
+LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, pathName) {
 
-    //todo add path name to the line and test for points and text
+    //todo text and point enable
+    //check if the path was created before
+    var texlineGroup;
+    if (pathName in this.groups === false) {
+        texlineGroup = new THREE.Group();
+        texlineGroup.name = pathName;
+        this.scene.add(texlineGroup);
+        this.groups[pathName] = texlineGroup
+    }
+    else {
+        texlineGroup = this.groups[pathName];
+    }
 
-    // var dotGeometry = new THREE.Geometry();
-    // dotGeometry.vertices.push(positionOnSphere(lat1,lon1,this.sphereRadius));
-    // var dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false } );
-    // var dot = new THREE.Points( dotGeometry, dotMaterial );
-    // this.scene.add( dot );
-
-    var startPosition = positionOnSphere(lat1,lon1,this.sphereRadius);
-    var endPosition = positionOnSphere(lat2,lon2,this.sphereRadius);
-
+    var startPosition = positionOnSphere(Number(lat1),Number(lon1),this.sphereRadius);
+    var endPosition = positionOnSphere(Number(lat2),Number(lon2),this.sphereRadius);
+    //add this points to hashTable, to create it only once
+    if (lat1+lon1 in this.points === false) {
+        console.log(lat1+lon1);
+        var geometry1 = new THREE.SphereGeometry( 0.2, 5, 5 );
+        var material1 = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+        var sphere1 = new THREE.Mesh( geometry1, material1 );
+        sphere1.position.copy(startPosition);
+        sphere1.name = lat1+lon1;
+        this.scene.add(sphere1);
+        this.points[lat1+lon1] = {};
+    }
+    if (lat2+lon2 in this.points === false) {
+        console.log(lat2+lon2);
+        var geometry2 = new THREE.SphereGeometry( 0.2, 5, 5 );
+        var material2 = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+        var sphere2 = new THREE.Mesh( geometry2, material2 );
+        sphere2.position.copy(endPosition);
+        sphere2.name = lat2+lon2;
+        this.scene.add(sphere2);
+        this.points[lat2+lon2] = {};
+    }
     //create curve to get center of the line
     var calculateCurve = new THREE.LineCurve3(startPosition,endPosition);
     var middlePosition = calculateCurve.getPoint(0.5);
-    console.log(middlePosition);
+    //console.log(middlePosition);
     var traceLenght = calculateCurve.getLength();
 
     //find position of centre on sphere with raycasting
@@ -67,7 +99,11 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color) 
 
     var materialL = new THREE.LineBasicMaterial( { color : color } );
     var curveObject = new THREE.Line( geometryL, materialL );
-    this.scene.add(curveObject);
+    texlineGroup.add(curveObject);
+
+    // var dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false } );
+    // var dot = new THREE.Points( dotGeometry, dotMaterial );
+    // this.scene.add( dot );
 
     //NOTICE that objects are added to sphere and not to scene, maybe i the furure we will need update positions
 };
@@ -76,7 +112,7 @@ LineGenerator.prototype.generateLines = function (path, color, text, point) {
     for (var i = 0; i < path.addresses.length-1; i++) {
 
         //console.log(array[i]);
-        this.generateLine(Number(path.addresses[i].lat),Number(path.addresses[i].lng),
-            Number(path.addresses[i+1].lat),Number(path.addresses[i+1].lng),color);
+        this.generateLine(path.addresses[i].lat,path.addresses[i].lng,
+            path.addresses[i+1].lat,path.addresses[i+1].lng,color,path.name);
     }
 };

@@ -9,8 +9,9 @@ function Main() {
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer();
     this.lineGenerator = new LineGenerator(radiusSize,this.scene);
+    this.controller = new Controller(this.scene);
     this.stats = new Stats();
-    this.controls = {buttonClicked:false, mouseDownX: 0, mouseDownY: 0};
+    this.controls = {buttonClicked:false, mouseDownX: 0, mouseDownY: 0, x: 0, y: 0};
     this.sphere;
 }
 
@@ -73,6 +74,7 @@ Main.prototype.init = function () {
     });
     this.sphere = new THREE.Mesh( geometry, material );
     this.lineGenerator.scene = this.sphere;
+    this.controller.scene = this.sphere;
     this.scene.add( this.sphere );
     this.sphere.translateX(-20);
     sphereTest = this.sphere;
@@ -85,6 +87,11 @@ Main.prototype.init = function () {
 
     var self = this;
     window.addEventListener( 'mousemove', function ( event ) {
+
+        self.controls.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        self.controls.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+
         if (self.controls.buttonClicked) {
             var x = -( self.controls.mouseDownX - event.clientX );
             var y = -( self.controls.mouseDownY - event.clientY );
@@ -92,7 +99,6 @@ Main.prototype.init = function () {
             self.controls.mouseDownX = event.clientX;
             self.controls.mouseDownY = event.clientY;
 
-            console.log(x);
 
             //cleaner micromovements
             // if (x < 4 && x > -4) {
@@ -104,7 +110,7 @@ Main.prototype.init = function () {
 
             var axis = new THREE.Vector3(y,x,0).normalize();
 
-            console.log(axis);
+            //console.log(axis);
             self.sphere.rotateOnWorldAxis(axis,0.03);
             //self.sphere.rotateY(x);
             //self.sphere.rotateX(y);
@@ -118,6 +124,14 @@ Main.prototype.init = function () {
         self.controls.mouseDownX = event.clientX;
         self.controls.mouseDownY = event.clientY;
         //console.log(self.controls.mouseDownY);
+
+        //Raycasting objects....
+        console.log("RAYCASTING");
+        var raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera( new THREE.Vector2(self.controls.x,self.controls.y), self.camera );
+        var intersects = raycaster.intersectObjects(self.sphere.children,true);
+        console.log(intersects[0].object);
+
     }, false);
     window.addEventListener( 'mouseup', function ( event ) {
         self.controls.buttonClicked = false;
@@ -125,7 +139,7 @@ Main.prototype.init = function () {
 
     window.addEventListener( 'mousewheel', function ( event ) {
         //console.log(event.wheelDeltaY);
-        self.camera.position.z += event.wheelDeltaY*0.006;
+        //self.camera.position.z += event.wheelDeltaY*0.006;
     }, false);
 
 
@@ -141,8 +155,4 @@ Main.prototype.animate = function () {
 
     this.renderer.render(this.scene, this.camera);
     this.stats.end();
-};
-
-Main.prototype.addLine = function (object) {
-
 };
