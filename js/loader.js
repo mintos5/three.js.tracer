@@ -43,6 +43,7 @@ function readData(url,text,group) {
             newAddress.time = row.data[0][3];
             newAddress.lat = row.data[0][4];
             newAddress.lng = row.data[0][5];
+            //todo add from path
             //push information to new forming path
             newPath.addresses.push(newAddress);
             //push pointer to hashTable
@@ -52,9 +53,10 @@ function readData(url,text,group) {
             addresses[newAddress.ip].push(newPath);
             //push pointer to GEO hashtable
             if (newAddress.lat+newAddress.lng in geos === false) {
-                geos[newAddress.lat+newAddress.lng] = {array: [], lat: newAddress.lat, lng: newAddress.lng};
+                geos[newAddress.lat+newAddress.lng] = {array: [], lat: newAddress.lat, lng: newAddress.lng, arrayIps: []};
             }
             geos[newAddress.lat+newAddress.lng].array.push(newPath);
+            geos[newAddress.lat+newAddress.lng].arrayIps.push(newAddress);
 
             last++;
             realPoints++;

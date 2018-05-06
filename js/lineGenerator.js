@@ -1,3 +1,5 @@
+var CLUSTER_SIZE = 20;
+
 function positionOnSphere(lat, lon, radius) {
     var phi   = (90-lat)*(Math.PI/180),
         theta = (lon+180)*(Math.PI/180),
@@ -76,14 +78,15 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
 
     //find position of centre on sphere with raycasting
     this.raycaster = new THREE.Raycaster();
-    this.raycaster.set(this.scene.getWorldPosition(),middlePosition.normalize());
+    var tempVector = this.scene.localToWorld(middlePosition);
+    this.raycaster.set(this.scene.getWorldPosition(),tempVector.normalize());
     var intersects = this.raycaster.intersectObject(this.scene,false);
     if (intersects.length > 0) {
         //position on sphere of the center of line
         middlePosition.copy(this.scene.worldToLocal(intersects[0].point));
         //move it litle above sphere
         var moveVector = new THREE.Vector3().copy(middlePosition);
-        moveVector.normalize().multiplyScalar(0.8*traceLenght);
+        moveVector.normalize().multiplyScalar(0.6*traceLenght);
         middlePosition.add(moveVector);
     }
     var curve = new THREE.QuadraticBezierCurve3(
@@ -95,11 +98,23 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
     //get three.js like
     var points = curve.getPoints( 18 );
 
+    console.log(points);
+
     var geometryL = new THREE.BufferGeometry().setFromPoints( points );
 
     var materialL = new THREE.LineBasicMaterial( { color : color } );
     var curveObject = new THREE.Line( geometryL, materialL );
+
     texlineGroup.add(curveObject);
+
+    // for (var i = 0; i< 19;i++) {
+    //     var geometryS = new THREE.SphereGeometry( 0.1, 5, 5 );
+    //
+    //     var materialS = new THREE.LineBasicMaterial( { color : color } );
+    //     var sphereLine =  new THREE.Mesh( geometryS, materialS );
+    //     sphereLine.position.set(points[i].x,points[i].y,points[i].z);
+    //     texlineGroup.add(sphereLine);
+    // }
 
     // var dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false } );
     // var dot = new THREE.Points( dotGeometry, dotMaterial );
@@ -108,11 +123,33 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
     //NOTICE that objects are added to sphere and not to scene, maybe i the furure we will need update positions
 };
 
-LineGenerator.prototype.generateLines = function (path, color, text, point) {
+LineGenerator.prototype.generateLines = function (path, color, text, point, zoom) {
+    var lastIndex = 0;
     for (var i = 0; i < path.addresses.length-1; i++) {
 
-        //console.log(array[i]);
-        this.generateLine(path.addresses[i].lat,path.addresses[i].lng,
-            path.addresses[i+1].lat,path.addresses[i+1].lng,color,path.name);
+
+        var startPosition = positionOnSphere(Number(path.addresses[lastIndex].lat),Number(path.addresses[lastIndex].lng),this.sphereRadius);
+        var endPosition = positionOnSphere(Number(path.addresses[i+1].lat),Number(path.addresses[i+1].lng),this.sphereRadius);
+
+        var calculateCurve = new THREE.LineCurve3(startPosition,endPosition);
+        var curveLenght = calculateCurve.getLength();
+        console.log("CLUSTERING");
+        console.log(curveLenght + " " + CLUSTER_SIZE*zoom);
+
+        if (curveLenght > CLUSTER_SIZE*zoom) {
+            //console.log(array[i]);
+            this.generateLine(path.addresses[lastIndex].lat,path.addresses[lastIndex].lng,
+                path.addresses[i+1].lat,path.addresses[i+1].lng,color,path.name);
+            lastIndex = i+1;
+        }
+        else {
+            console.log("Skipping this line");
+        }
     }
+    if (lastIndex !== path.addresses.length-1) {
+        console.log("drawing the last line");
+        this.generateLine(path.addresses[lastIndex].lat,path.addresses[lastIndex].lng,
+            path.addresses[path.addresses.length-1].lat,path.addresses[path.addresses.length-1].lng,color,path.name);
+    }
+    //todo check if lastIndex was used, if no write the last line
 };

@@ -72,7 +72,7 @@ Controller.prototype.pathFromElse = function (pathName,source, geos) {
 Controller.prototype.addLine = function (pathName) {
     console.log(pathName);
     //add options
-
+    //todo save to array/hash if the options are created...
     var checkbox1 = document.createElement("input");
     checkbox1.type = "checkbox";
     checkbox1.id = pathName;
@@ -110,13 +110,13 @@ Controller.prototype.addLine = function (pathName) {
     if (document.getElementById("groupingCheckBox").checked) {
         for (var key in paths) {
             if (paths[key].group === pathName) {
-                main.lineGenerator.generateLines(paths[key],color.value,false,false);
+                main.lineGenerator.generateLines(paths[key],color.value,false,false,main.cameraZoom);
             }
         }
     }
     //GROUPING disabled
     else {
-        main.lineGenerator.generateLines(paths[pathName],color.value,false,false);
+        main.lineGenerator.generateLines(paths[pathName],color.value,false,false,main.cameraZoom);
     }
 
 };
@@ -195,6 +195,7 @@ Controller.prototype.modifyLine = function (pathName, allPaths) {
 };
 
 Controller.prototype.generateLines = function () {
+    //todo after removing the line, the new color is set
     this.removeAll(false);
     //add all paths
     var pathsValues = this.choicesPaths.getValue(true);
@@ -256,6 +257,58 @@ Controller.prototype.loadChoices = function () {
     this.choicesGeos.setChoices(arrayGeos,'value','label', true);
 };
 
-Controller.prototype.selection = function () {
+Controller.prototype.selectionCreate = function (geoInfo) {
+    //todo check if the div is created
+    console.log(geoInfo);
+    var selectFloat = document.getElementById("selectFloat");
+    selectFloat.style.display = "block";
 
+
+    var selectFloatText = document.getElementById("selectFloatText");
+
+    var h31 = document.createElement("h3");
+    h31.innerText = "GEO";
+    selectFloatText.appendChild(h31);
+
+    var checkbox1 = document.createElement("input");
+    checkbox1.type = "checkbox";
+    checkbox1.id = geoInfo;
+    selectFloatText.appendChild(checkbox1);
+
+    var text1 = document.createTextNode(geos[geoInfo].lat + " " + geos[geoInfo].lng);
+    selectFloatText.appendChild(text1);
+
+    var h32 = document.createElement("h3");
+    h32.innerText = "IP";
+    selectFloatText.appendChild(h32);
+
+    for (var i =0; i < geos[geoInfo].arrayIps.length; i++) {
+        var checkbox2 = document.createElement("input");
+        checkbox2.type = "checkbox";
+        checkbox2.id = geos[geoInfo].arrayIps[i].ip;
+        selectFloatText.appendChild(checkbox2);
+        var text2 = document.createTextNode(geos[geoInfo].arrayIps[i].name + " " + geos[geoInfo].arrayIps[i].ip);
+        selectFloatText.appendChild(text2);
+        var newLine = document.createElement("br");
+        selectFloatText.appendChild(newLine);
+    }
+
+    var line = document.createElement("hr");
+    selectFloatText.appendChild(line);
+};
+
+Controller.prototype.selectionClose = function () {
+    //remove all old childs of div
+    var selectFloatText = document.getElementById("selectFloatText");
+    while (selectFloatText.firstChild) {
+        selectFloatText.removeChild(selectFloatText.firstChild);
+    }
+    //dont display the parent div
+    var selectFloat = document.getElementById("selectFloat");
+    selectFloat.style.display = "none";
+};
+
+Controller.prototype.selection = function () {
+    //todo check if the div is created
+    this.selectionClose();
 };

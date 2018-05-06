@@ -11,6 +11,13 @@
             margin: 0px;
             overflow: hidden;
         }
+        #mainCanvas {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 70%;
+            height: 100%;
+        }
         #select {
             position: absolute;
             right: 0px;
@@ -20,7 +27,17 @@
             overflow-y: scroll;
             overflow-x: hidden;
 
-            background: gray;
+            background: lightgray;
+        }
+        #selectFloat {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            width: 30%;
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            background: darkgray;
         }
     </style>
 
@@ -37,6 +54,8 @@
     <script src="js/lineGenerator.js"></script>
     <script src="js/loader.js"></script>
     <script src="js/main.js"></script>
+
+    <div id="mainCanvas"></div>
 
     <div id="select">
         <div id="buttonCorrect" style="text-align: center; margin-top: 10px">
@@ -72,6 +91,14 @@
             <!--<input type="submit" value="Submit">-->
         <!--</form>-->
 
+    </div>
+
+    <div id="selectFloat" style="display: none">
+        <div id="selectFloatText"></div>
+        <div id="buttonCorrect2" style="text-align: center; margin-top: 10px">
+            <button id="selectButton" onclick="main.controller.selection()">Select</button>
+            <button id="closeButton" onclick="main.controller.selectionClose()">Close</button>
+        </div>
     </div>
 
 
