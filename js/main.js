@@ -20,7 +20,6 @@ function Main() {
 
 //todo bublinky zmenit farbu
 //todo clustering urobit ho plynulo, asi vsetko prekreslovat
-//todo filter ten grouping
 //todo rekonfiguracia tvaru, dat prec text a namiesto neho toto
 //todo removing lines by one....
 //todo starting point, ending point

@@ -62,24 +62,23 @@
             <button id="selectAll" onclick="main.controller.addAll()">Select All</button>
             <button id="unSelectALl" onclick="main.controller.removeAll(true)">Unselect all</button>
         </div>
-        <h3>Paths</h3>
+        <h3>Paths <img src="js/choices/icons/cross-inverse.svg" style="width: 3%" onclick="main.controller.removeAllPaths()"></h3>
         <select id="choicesPaths" multiple></select>
 
-        <h3>IP Address</h3>
+        <h3>IP Address <img src="js/choices/icons/cross-inverse.svg" style="width: 3%" onclick="main.controller.removeAllIps()"></h3>
         <select id="choicesIps" multiple></select>
 
-        <h3>GEO</h3>
+        <h3>GEO <img src="js/choices/icons/cross-inverse.svg" style="width: 3%" onclick="main.controller.removeAllGeos()"></h3>
         <select id="choicesGeos" multiple></select>
-
-
-        <div id="checkBoxCorrect" style="text-align: center">
-            <input id="clusteringCheckBox" type="checkbox" name="clustering">clustering
-            <input id="groupingCheckBox" type="checkbox" name="grouping" onclick="main.controller.removeAll(true)">grouping
-        </div>
         <hr>
 
         <div id="pathsCorrect">
-            <input type="checkbox" name="Enable Marker" onclick="main.controller.modifyLine('',true)">TEXT<input type="checkbox"  onclick="main.controller.modifyLine('',true)">POINT<input type="color" value="#ffffff" oninput="main.controller.modifyLine('',true)">
+            <input type="checkbox"  onclick="main.controller.modifyLine('',true)">POINT
+            <select name="enableAll">
+                <option value="line">line</option>
+                <option value="point">point</option>
+            </select>
+            <input type="color" value="#ffffff" oninput="main.controller.modifyLine('',true)">
             <label>Enable all</label>
             <br>
 

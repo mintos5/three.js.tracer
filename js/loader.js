@@ -2,10 +2,9 @@ var tracesCount = 0;
 var tracesCounter = 0;
 var realPoints;
 var points;
-function readData(url,text,group) {
+function readData(url,text) {
     var newPath = {name: text,
-        addresses: [],
-        group: group};
+        addresses: []};
     //same name path exists, add random number to the end of the name
     if (text in paths === true) {
         text += Math.random().toString(36).substring(7);
@@ -85,7 +84,7 @@ function loadDataFromServer() {
     //Argentina
     tracesCount = tracesCount+20;
     for (var i =1; i<=20;i++) {
-        readData("data/Argentina/Argentina" + i + ".csv","Argentina"+ i + ".csv","Argentina");
+        readData("data/Argentina/Argentina" + i + ".csv","Argentina"+ i + ".csv");
     }
     /*
     //Arizona

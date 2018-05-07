@@ -58,14 +58,7 @@ Controller.prototype.pathFromElse = function (pathName,source, geos) {
         addedPaths = source[pathName];
     }
     for (var i = 0; i < addedPaths.length; i++) {
-        //GROUPING enabled
-        if (document.getElementById("groupingCheckBox").checked) {
-            this.choicesPaths.setValueByChoice(addedPaths[i].group);
-        }
-        //GROUPING disabled
-        else {
-            this.choicesPaths.setValueByChoice(addedPaths[i].name);
-        }
+        this.choicesPaths.setValueByChoice(addedPaths[i].name);
     }
 };
 
@@ -106,18 +99,7 @@ Controller.prototype.addLine = function (pathName) {
     parentDiv.appendChild(br);
 
     //add line to threejs
-    //GROUPING enabled
-    if (document.getElementById("groupingCheckBox").checked) {
-        for (var key in paths) {
-            if (paths[key].group === pathName) {
-                main.lineGenerator.generateLines(paths[key],color.value,false,false,main.cameraZoom);
-            }
-        }
-    }
-    //GROUPING disabled
-    else {
-        main.lineGenerator.generateLines(paths[pathName],color.value,false,false,main.cameraZoom);
-    }
+    main.lineGenerator.generateLines(paths[pathName],color.value,false,false,main.cameraZoom);
 
 };
 
@@ -125,21 +107,8 @@ Controller.prototype.addAll = function () {
     console.log("ADD ALL");
     //add everything from paths
 
-    //GROUPING enabled
-    if (document.getElementById("groupingCheckBox").checked) {
-        var groupHashTable = {};
-        for (var key1 in paths) {
-            groupHashTable[paths[key1].group] = paths[key1].group;
-        }
-        for (var key2 in groupHashTable) {
-            this.choicesPaths.setValueByChoice(key2);
-        }
-    }
-    //GROUPING disabled
-    else {
-        for (var key3 in paths) {
-            this.choicesPaths.setValueByChoice(key3);
-        }
+    for (var key in paths) {
+        this.choicesPaths.setValueByChoice(key);
     }
 };
 
@@ -190,6 +159,18 @@ Controller.prototype.removeAll = function (reloadChoices) {
 
 };
 
+Controller.prototype.removeAllPaths = function () {
+    console.log("WHAAAT paths?");
+};
+
+Controller.prototype.removeAllIps = function () {
+
+};
+
+Controller.prototype.removeAllGeos = function () {
+
+};
+
 Controller.prototype.modifyLine = function (pathName, allPaths) {
 
 };
@@ -219,25 +200,11 @@ Controller.prototype.loadChoices = function () {
     this.choicesIps.clearStore();
     this.choicesGeos.clearStore();
     //paths loading
-    //show as groups
     var arrayPaths = [];
-    if (document.getElementById("groupingCheckBox").checked){
-        var groupHashTable = {};
-        for (var key1 in paths) {
-            groupHashTable[paths[key1].group] = paths[key1].group;
-        }
-        for (var key2 in groupHashTable) {
-            arrayPaths.push({value: key2, label:key2});
-        }
-        this.choicesPaths.setChoices(arrayPaths,'value','label', true);
+    for (var key3 in paths) {
+        arrayPaths.push({value: key3, label:key3});
     }
-    //show as paths
-    else {
-        for (var key3 in paths) {
-            arrayPaths.push({value: key3, label:key3});
-        }
-        this.choicesPaths.setChoices(arrayPaths,'value','label', true);
-    }
+    this.choicesPaths.setChoices(arrayPaths,'value','label', true);
     console.log(arrayPaths);
 
     //IP loading
