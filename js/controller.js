@@ -19,7 +19,7 @@ function Controller(scene) {
     });
 
     this.choicesPaths.passedElement.addEventListener('removeItem', function(event) {
-        self.generateLines();
+        self.updateLines(1, event.detail.value);
     });
 
 
@@ -28,11 +28,11 @@ function Controller(scene) {
         choices: []});
     this.choicesIps.passedElement.addEventListener('addItem', function(event) {
         //found all paths with this ip
-        self.pathFromElse(event.detail.value,addresses,false);
+        self.pathFromElse(event.detail.value,addresses,false,false);
     });
 
     this.choicesIps.passedElement.addEventListener('removeItem', function(event) {
-        self.generateLines();
+        self.updateLines(2, event.detail.value);
     });
 
 
@@ -41,24 +41,49 @@ function Controller(scene) {
         choices: []});
     this.choicesGeos.passedElement.addEventListener('addItem', function(event) {
         //found additional paths with this geo informs
-        self.pathFromElse(event.detail.value,geos,true);
+        self.pathFromElse(event.detail.value,geos,true,false);
     });
 
     this.choicesGeos.passedElement.addEventListener('removeItem', function(event) {
-        self.generateLines();
+        self.updateLines(3, event.detail.value);
     });
 }
 
-Controller.prototype.pathFromElse = function (pathName,source, geos) {
+Controller.prototype.pathFromElse = function (keyName,source, isGeos , isReturn) {
     var addedPaths;
-    if (geos) {
-        addedPaths = source[pathName].array;
+    if (isGeos) {
+        addedPaths = source[keyName].array;
     }
     else {
-        addedPaths = source[pathName];
+        addedPaths = source[keyName];
     }
-    for (var i = 0; i < addedPaths.length; i++) {
-        this.choicesPaths.setValueByChoice(addedPaths[i].name);
+    if (isReturn) {
+        return addedPaths;
+    }
+    else {
+        for (var i = 0; i < addedPaths.length; i++) {
+            this.choicesPaths.setValueByChoice(addedPaths[i].name);
+        }
+    }
+};
+
+Controller.prototype.compareAndRemove = function (element,elementLocation,isGeos) {
+
+    //removing from IPs, generate list of paths needed to remove
+    var elementPaths = this.pathFromElse(element,elementLocation,isGeos,true);
+    var pathsValues = this.choicesPaths.getValue(true);
+    //check if the path is already removed and if no removed it
+
+    console.log(elementPaths);
+    console.log(pathsValues);
+
+    for (var i = 0; i < elementPaths.length; i++) {
+        for (var j = 0; j < pathsValues.length; j++){
+            if (pathsValues[j] === elementPaths[i].name) {
+                this.choicesPaths.removeItemsByValue(pathsValues[j]);
+                break;
+            }
+        }
     }
 };
 
@@ -66,37 +91,43 @@ Controller.prototype.addLine = function (pathName) {
     console.log(pathName);
     //add options
     //todo save to array/hash if the options are created...
-    var checkbox1 = document.createElement("input");
-    checkbox1.type = "checkbox";
-    checkbox1.id = pathName;
-    checkbox1.onclick = main.controller.modifyLine("pathName,false");
-    var text1 = document.createTextNode('TEXT');
-
-    var checkbox2 = document.createElement("input");
-    checkbox2.type = "checkbox";
-    checkbox2.id = pathName;
-    checkbox2.onclick = main.controller.modifyLine("pathName,false");
-    var text2 = document.createTextNode('POINT');
+    var select = document.createElement("select");
+    select.type = "select";
+    select.onchange = function () {
+        main.controller.modifyLine(pathName,false);
+    };
+    var opt1 = document.createElement("option");
+    opt1.value = "line";
+    opt1.text = "line";
+    var opt2 = document.createElement("option");
+    opt2.value = "point";
+    opt2.text = "point";
+    var opt3 = document.createElement("option");
+    opt3.value = "sphere";
+    opt3.text = "sphere";
+    select.appendChild(opt1);
+    select.appendChild(opt2);
+    select.appendChild(opt3);
 
     var color = document.createElement("input");
     color.type = "color";
-    color.onclick = main.controller.modifyLine("pathName,false");
-    color.id = pathName;
+    color.oninput = function (ev) {
+        main.controller.modifyLine(pathName,false);
+    };
     color.value = getRandomColor();
+    color.style.height = "20px";
+    color.style.marginLeft = "2px";
 
     var label = document.createElement("label");
-    label.innerHTML = pathName;
+    label.innerHTML = " " + pathName;
 
-    var br = document.createElement("br");
-
-    var parentDiv = document.getElementById("pathsCorrect");
-    parentDiv.appendChild(checkbox1);
-    parentDiv.appendChild(text1);
-    parentDiv.appendChild(checkbox2);
-    parentDiv.appendChild(text2);
+    var divPaths = document.getElementById("pathsCorrect");
+    var parentDiv = document.createElement("div");
+    parentDiv.id = pathName;
+    divPaths.appendChild(parentDiv);
+    parentDiv.appendChild(select);
     parentDiv.appendChild(color);
     parentDiv.appendChild(label);
-    parentDiv.appendChild(br);
 
     //add line to threejs
     main.lineGenerator.generateLines(paths[pathName],color.value,false,false,main.cameraZoom);
@@ -112,6 +143,13 @@ Controller.prototype.addAll = function () {
     }
 };
 
+
+Controller.prototype.remove = function (pathName) {
+    main.lineGenerator.removeLine(pathName);
+    var divPaths = document.getElementById(pathName);
+    divPaths.parentNode.removeChild(divPaths);
+};
+
 Controller.prototype.removeAll = function (reloadChoices) {
     console.log("REMOVE ALL");
     if (reloadChoices) {
@@ -120,78 +158,104 @@ Controller.prototype.removeAll = function (reloadChoices) {
     main.lineGenerator.removeAll();
 
     //remove div and create it again
-    var element = document.getElementById("pathsCorrect");
-    element.parentNode.removeChild(element);
+    var divPaths = document.getElementById("pathsCorrect");
+    var divSelect = divPaths.parentNode;
+    divSelect.removeChild(divPaths);
+    divPaths = document.createElement("div");
+    divPaths.id = "pathsCorrect";
+    divSelect.appendChild(divPaths);
 
-    var checkbox1 = document.createElement("input");
-    checkbox1.type = "checkbox";
-    checkbox1.onclick = main.controller.modifyLine("",true);
-    var text1 = document.createTextNode('TEXT');
-
-    var checkbox2 = document.createElement("input");
-    checkbox2.type = "checkbox";
-    checkbox2.onclick = main.controller.modifyLine("",true);
-    var text2 = document.createTextNode('POINT');
+    //create first elements
+    var select = document.createElement("select");
+    select.type = "select";
+    select.onchange = function () {
+        main.controller.modifyLine("",true);
+    };
+    var opt1 = document.createElement("option");
+    opt1.value = "line";
+    opt1.text = "line";
+    var opt2 = document.createElement("option");
+    opt2.value = "point";
+    opt2.text = "point";
+    var opt3 = document.createElement("option");
+    opt3.value = "sphere";
+    opt3.text = "sphere";
+    select.appendChild(opt1);
+    select.appendChild(opt2);
+    select.appendChild(opt3);
 
     var color = document.createElement("input");
     color.type = "color";
-    color.onclick = main.controller.modifyLine("",true);
-    color.value = getRandomColor();
+    color.style.height = "20px";
+    color.style.marginLeft = "2px";
+    color.oninput = function (ev) {
+        main.controller.modifyLine("",true);
+    };
+    color.value = "#ffffff";
 
     var label = document.createElement("label");
-    label.innerHTML = "Enable ALL";
+    label.innerHTML = " Enable all";
 
-    var br = document.createElement("br");
-
-    var divSelect = document.getElementById("select");
+    var checkbox1 = document.createElement("input");
+    checkbox1.type = "checkbox";
+    checkbox1.onclick = function (ev) {
+        main.controller.modifyLine("",true);
+    };
+    var text1 = document.createTextNode('POINTS');
 
     var parentDiv = document.createElement("div");
-    parentDiv.id = "pathsCorrect";
     //add created div to the select div
-    divSelect.appendChild(parentDiv);
-    parentDiv.appendChild(checkbox1);
-    parentDiv.appendChild(text1);
-    parentDiv.appendChild(checkbox2);
-    parentDiv.appendChild(text2);
+    divPaths.appendChild(parentDiv);
+    parentDiv.appendChild(select);
     parentDiv.appendChild(color);
     parentDiv.appendChild(label);
-    parentDiv.appendChild(br);
-
-};
-
-Controller.prototype.removeAllPaths = function () {
-    console.log("WHAAAT paths?");
-};
-
-Controller.prototype.removeAllIps = function () {
-
-};
-
-Controller.prototype.removeAllGeos = function () {
+    parentDiv.appendChild(checkbox1);
+    parentDiv.appendChild(text1);
 
 };
 
 Controller.prototype.modifyLine = function (pathName, allPaths) {
-
+    console.log("MODIFY" + pathName + " " + allPaths);
 };
 
-Controller.prototype.generateLines = function () {
-    //todo after removing the line, the new color is set
-    this.removeAll(false);
-    //add all paths
-    var pathsValues = this.choicesPaths.getValue(true);
-    for (var i =0 ; i < pathsValues.length; i++) {
-        this.addLine(pathsValues[i])
+Controller.prototype.updateLines = function (intFunction, element) {
+
+    console.log("UPDATE_LINES" + intFunction + " " + element);
+
+    if (intFunction === 1) {
+        //removing from three.js
+        var pathName = element;
+        this.remove(pathName);
+        //remove extra paths from IPs and GEOS
+        var addressesValues1 = this.choicesIps.getValue(true);
+        for (var i =0 ; i < addressesValues1.length; i++) {
+            var addressesPaths1 = this.pathFromElse(addressesValues1[i],addresses,false,true);
+            //check if this address contains removed path
+            for (var j = 0; j < addressesPaths1.length; j++) {
+                if (pathName === addressesPaths1[j].name) {
+                    this.choicesIps.removeItemsByValue(addressesValues1[i]);
+                    break;
+                }
+            }
+        }
+        var geosValues1 = this.choicesGeos.getValue(true);
+        for (var k =0 ; k < geosValues1.length; k++) {
+            var geosPaths1 = this.pathFromElse(geosValues1[k],geos,true,true);
+            //check if this geo contains removed path
+            for (var l = 0; l < geosPaths1.length; l++) {
+                if (pathName === geosPaths1[l].name) {
+                    this.choicesGeos.removeItemsByValue(geosValues1[k]);
+                    break;
+                }
+            }
+        }
+
     }
-    //add additional paths from ips
-    var addressesValues = this.choicesIps.getValue(true);
-    for (var j =0 ; j < addressesValues.length; j++) {
-        this.pathFromElse(addressesValues[j],addresses,false);
+    else if (intFunction === 2) {
+        this.compareAndRemove(element,addresses,false);
     }
-    //add additonal paths from geos
-    var geosValues = this.choicesGeos.getValue(true);
-    for (var k =0 ; k < geosValues.length; k++) {
-        this.pathFromElse(geosValues[k],geos,true);
+    else if (intFunction === 3) {
+        this.compareAndRemove(element,geos,true);
     }
 };
 

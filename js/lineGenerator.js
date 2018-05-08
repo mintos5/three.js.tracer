@@ -16,6 +16,7 @@ function LineGenerator(radius, scene) {
     this.scene = scene;
     this.raycaster = new THREE.Raycaster();
     this.points = {};
+    this.pointsInPath = {};
     this.groups = {};
 }
 
@@ -30,11 +31,15 @@ LineGenerator.prototype.removeAll = function () {
 
 LineGenerator.prototype.removeLine = function (pathName) {
     this.scene.remove(this.scene.getObjectByName(pathName));
+    delete this.groups[pathName];
+    for (var i = 0; i < this.pointsInPath[pathName].length; i++) {
+        delete this.points[this.pointsInPath[pathName][i]];
+    }
 };
 
 LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, pathName) {
 
-    //todo text and point enable
+    //todo add point/line/sphere enable
     //check if the path was created before
     var texlineGroup;
     if (pathName in this.groups === false) {
@@ -42,6 +47,7 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
         texlineGroup.name = pathName;
         this.scene.add(texlineGroup);
         this.groups[pathName] = texlineGroup
+        this.pointsInPath[pathName] = [];
     }
     else {
         texlineGroup = this.groups[pathName];
@@ -57,8 +63,9 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
         var sphere1 = new THREE.Mesh( geometry1, material1 );
         sphere1.position.copy(startPosition);
         sphere1.name = lat1+lon1;
-        this.scene.add(sphere1);
+        texlineGroup.add(sphere1);
         this.points[lat1+lon1] = {};
+        this.pointsInPath[pathName].push(lat1+lon1);
     }
     if (lat2+lon2 in this.points === false) {
         console.log(lat2+lon2);
@@ -67,8 +74,9 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
         var sphere2 = new THREE.Mesh( geometry2, material2 );
         sphere2.position.copy(endPosition);
         sphere2.name = lat2+lon2;
-        this.scene.add(sphere2);
+        texlineGroup.add(sphere2);
         this.points[lat2+lon2] = {};
+        this.pointsInPath[pathName].push(lat1+lon1);
     }
     //create curve to get center of the line
     var calculateCurve = new THREE.LineCurve3(startPosition,endPosition);
@@ -105,7 +113,7 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
     var materialL = new THREE.LineBasicMaterial( { color : color } );
     var curveObject = new THREE.Line( geometryL, materialL );
 
-    texlineGroup.add(curveObject);
+    //texlineGroup.add(curveObject);
 
     // for (var i = 0; i< 19;i++) {
     //     var geometryS = new THREE.SphereGeometry( 0.1, 5, 5 );
@@ -116,9 +124,13 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
     //     texlineGroup.add(sphereLine);
     // }
 
-    // var dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false } );
-    // var dot = new THREE.Points( dotGeometry, dotMaterial );
-    // this.scene.add( dot );
+    for (var i = 0; i< 19;i++) {
+        var dotGeometry = new THREE.Geometry();
+        dotGeometry.vertices.push(new THREE.Vector3(points[i].x,points[i].y,points[i].z));
+        var dotMaterial = new THREE.PointsMaterial( { size: 4, sizeAttenuation: false, color: color } );
+        var dot = new THREE.Points( dotGeometry, dotMaterial );
+        texlineGroup.add( dot );
+    }
 
     //NOTICE that objects are added to sphere and not to scene, maybe i the furure we will need update positions
 };

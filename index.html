@@ -62,25 +62,23 @@
             <button id="selectAll" onclick="main.controller.addAll()">Select All</button>
             <button id="unSelectALl" onclick="main.controller.removeAll(true)">Unselect all</button>
         </div>
-        <h3>Paths <img src="js/choices/icons/cross-inverse.svg" style="width: 3%" onclick="main.controller.removeAllPaths()"></h3>
+        <h3>Paths</h3>
         <select id="choicesPaths" multiple></select>
 
-        <h3>IP Address <img src="js/choices/icons/cross-inverse.svg" style="width: 3%" onclick="main.controller.removeAllIps()"></h3>
+        <h3>IP Address</h3>
         <select id="choicesIps" multiple></select>
 
-        <h3>GEO <img src="js/choices/icons/cross-inverse.svg" style="width: 3%" onclick="main.controller.removeAllGeos()"></h3>
+        <h3>GEO</h3>
         <select id="choicesGeos" multiple></select>
         <hr>
 
         <div id="pathsCorrect">
-            <input type="checkbox"  onclick="main.controller.modifyLine('',true)">POINT
-            <select name="enableAll">
-                <option value="line">line</option>
-                <option value="point">point</option>
-            </select>
-            <input type="color" value="#ffffff" oninput="main.controller.modifyLine('',true)">
-            <label>Enable all</label>
-            <br>
+            <div>
+                <select name="enableAll" onchange="main.controller.modifyLine('',true)">
+                    <option value="line">line</option>
+                    <option value="point">point</option>
+                    <option value="sphere">sphere</option>
+                </select><input type="color" style="height: 20px; margin-left: 2px" value="#ffffff" oninput="main.controller.modifyLine('',true)"> Enable all<input type="checkbox"  onclick="main.controller.modifyLine('',true)">POINTS</div>
 
         </div>
 
