@@ -397,13 +397,19 @@ Controller.prototype.selectionCreate = function (geoInfo) {
     h32.innerText = "IP";
     selectFloatForm.appendChild(h32);
 
+    //fix same IPs in array
+    var hashTable = {};
     for (var i =0; i < geos[geoInfo].arrayIps.length; i++) {
+        hashTable[geos[geoInfo].arrayIps[i].ip] = {name: geos[geoInfo].arrayIps[i].name, ip: geos[geoInfo].arrayIps[i].ip}
+    }
+
+    for (var key in hashTable) {
         var checkbox2 = document.createElement("input");
         checkbox2.type = "checkbox";
         checkbox2.name = "ip";
-        checkbox2.value = geos[geoInfo].arrayIps[i].ip;
+        checkbox2.value = hashTable[key].ip;
         selectFloatForm.appendChild(checkbox2);
-        var text2 = document.createTextNode(geos[geoInfo].arrayIps[i].name + " " + geos[geoInfo].arrayIps[i].ip);
+        var text2 = document.createTextNode(hashTable[key].name + " " + hashTable[key].ip);
         selectFloatForm.appendChild(text2);
         var newLine = document.createElement("br");
         selectFloatForm.appendChild(newLine);
