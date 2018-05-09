@@ -9,6 +9,7 @@ function getRandomColor() {
 
 
 function Controller(scene) {
+    this.pointsEnabled = true;
     this.scene = scene;
     this.choicesPaths = new Choices('#choicesPaths', {
         removeItemButton: true,
@@ -90,7 +91,6 @@ Controller.prototype.compareAndRemove = function (element,elementLocation,isGeos
 Controller.prototype.addLine = function (pathName) {
     console.log(pathName);
     //add options
-    //todo save to array/hash if the options are created...
     var select = document.createElement("select");
     select.type = "select";
     select.onchange = function () {
@@ -130,7 +130,7 @@ Controller.prototype.addLine = function (pathName) {
     parentDiv.appendChild(label);
 
     //add line to threejs
-    main.lineGenerator.generateLines(paths[pathName],color.value,false,false,main.cameraZoom);
+    main.lineGenerator.generateLines(paths[pathName],color.value,this.pointsEnabled,main.cameraZoom,main.lineGenerator.styleEnum.line);
 
 };
 
@@ -167,6 +167,7 @@ Controller.prototype.removeAll = function (reloadChoices) {
 
     //create first elements
     var select = document.createElement("select");
+    select.id = "enableAllSelect";
     select.type = "select";
     select.onchange = function () {
         main.controller.modifyLine("",true);
@@ -185,6 +186,7 @@ Controller.prototype.removeAll = function (reloadChoices) {
     select.appendChild(opt3);
 
     var color = document.createElement("input");
+    color.id = "enableAllColor";
     color.type = "color";
     color.style.height = "20px";
     color.style.marginLeft = "2px";
@@ -198,6 +200,8 @@ Controller.prototype.removeAll = function (reloadChoices) {
 
     var checkbox1 = document.createElement("input");
     checkbox1.type = "checkbox";
+    checkbox1.id = "pointsEnable";
+    checkbox1.checked = this.pointsEnabled;
     checkbox1.onclick = function (ev) {
         main.controller.modifyLine("",true);
     };
@@ -216,6 +220,58 @@ Controller.prototype.removeAll = function (reloadChoices) {
 
 Controller.prototype.modifyLine = function (pathName, allPaths) {
     console.log("MODIFY" + pathName + " " + allPaths);
+    if (allPaths) {
+        var checkboxPointsEnabled = document.getElementById("pointsEnable");
+        if (checkboxPointsEnabled.checked) {
+            this.pointsEnabled = true;
+        }
+        else {
+            this.pointsEnabled = false;
+        }
+        //set all divs to the enableAll settings
+        var select = document.getElementById("enableAllSelect").value;
+        var color = document.getElementById("enableAllColor").value;
+
+        var divConfig = document.getElementById("pathsCorrect");
+        var allDivs = divConfig.getElementsByTagName("div");
+        for (var i = 1; i < allDivs.length; i++) {
+            var selectConfig = allDivs[i].getElementsByTagName("select");
+            selectConfig[0].value = select;
+            var colorConfig = allDivs[i].getElementsByTagName("input");
+            colorConfig[0].value = color;
+        }
+
+        //remove all and reload all lines
+        main.lineGenerator.removeAll();
+        var pathsValues = this.choicesPaths.getValue(true);
+        for (var j = 0; j < pathsValues.length; j++){
+            this.reloadLine(pathsValues[j]);
+        }
+    }
+    else {
+        //modify just one line
+        main.lineGenerator.removeLine(pathName);
+        this.reloadLine(pathName);
+    }
+};
+
+Controller.prototype.reloadLine = function (pathName) {
+    //function to load line setting and write it to viewer, this do not remove old lines
+    var divConfig = document.getElementById(pathName);
+    var selectConfig = divConfig.getElementsByTagName("select");
+    var colorConfig = divConfig.getElementsByTagName("input");
+    if (selectConfig[0].value === "line") {
+        main.lineGenerator.generateLines(paths[pathName],colorConfig[0].value,
+            this.pointsEnabled,main.cameraZoom,main.lineGenerator.styleEnum.line)
+    }
+    else if (selectConfig[0].value === "point") {
+        main.lineGenerator.generateLines(paths[pathName],colorConfig[0].value,
+            this.pointsEnabled,main.cameraZoom,main.lineGenerator.styleEnum.point)
+    }
+    else if (selectConfig[0].value === "sphere") {
+        main.lineGenerator.generateLines(paths[pathName],colorConfig[0].value,
+            this.pointsEnabled,main.cameraZoom,main.lineGenerator.styleEnum.sphere)
+    }
 };
 
 Controller.prototype.updateLines = function (intFunction, element) {

@@ -74,11 +74,11 @@
 
         <div id="pathsCorrect">
             <div>
-                <select name="enableAll" onchange="main.controller.modifyLine('',true)">
+                <select id="enableAllSelect" name="enableAll" onchange="main.controller.modifyLine('',true)">
                     <option value="line">line</option>
                     <option value="point">point</option>
                     <option value="sphere">sphere</option>
-                </select><input type="color" style="height: 20px; margin-left: 2px" value="#ffffff" oninput="main.controller.modifyLine('',true)"> Enable all<input type="checkbox"  onclick="main.controller.modifyLine('',true)">POINTS</div>
+                </select><input id="enableAllColor" type="color" style="height: 20px; margin-left: 2px" value="#ffffff" oninput="main.controller.modifyLine('',true)"> Enable all<input type="checkbox" checked="true" id="pointsEnable" onclick="main.controller.modifyLine('',true)">POINTS</div>
 
         </div>
 

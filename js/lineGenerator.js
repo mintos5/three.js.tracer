@@ -18,6 +18,7 @@ function LineGenerator(radius, scene) {
     this.points = {};
     this.pointsInPath = {};
     this.groups = {};
+    this.styleEnum = Object.freeze({"line":1, "point":2, "sphere":3});
 }
 
 LineGenerator.prototype.removeAll = function () {
@@ -32,12 +33,13 @@ LineGenerator.prototype.removeAll = function () {
 LineGenerator.prototype.removeLine = function (pathName) {
     this.scene.remove(this.scene.getObjectByName(pathName));
     delete this.groups[pathName];
-    for (var i = 0; i < this.pointsInPath[pathName].length; i++) {
+    for (var i = this.pointsInPath[pathName].length-1; i >= 0; i--) {
+        console.log("removeLine " + this.pointsInPath[pathName][i]);
         delete this.points[this.pointsInPath[pathName][i]];
     }
 };
 
-LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, pathName) {
+LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, pathName, point, styleEnum) {
 
     //todo add point/line/sphere enable
     //check if the path was created before
@@ -46,7 +48,7 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
         texlineGroup = new THREE.Group();
         texlineGroup.name = pathName;
         this.scene.add(texlineGroup);
-        this.groups[pathName] = texlineGroup
+        this.groups[pathName] = texlineGroup;
         this.pointsInPath[pathName] = [];
     }
     else {
@@ -57,26 +59,30 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
     var endPosition = positionOnSphere(Number(lat2),Number(lon2),this.sphereRadius);
     //add this points to hashTable, to create it only once
     if (lat1+lon1 in this.points === false) {
-        console.log(lat1+lon1);
-        var geometry1 = new THREE.SphereGeometry( 0.2, 5, 5 );
-        var material1 = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-        var sphere1 = new THREE.Mesh( geometry1, material1 );
-        sphere1.position.copy(startPosition);
-        sphere1.name = lat1+lon1;
-        texlineGroup.add(sphere1);
+        console.log("POINT" + lat1+lon1);
+        if (point) {
+            var geometry1 = new THREE.SphereGeometry( 0.2, 5, 5 );
+            var material1 = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+            var sphere1 = new THREE.Mesh( geometry1, material1 );
+            sphere1.position.copy(startPosition);
+            sphere1.name = lat1+lon1;
+            texlineGroup.add(sphere1);
+        }
         this.points[lat1+lon1] = {};
         this.pointsInPath[pathName].push(lat1+lon1);
     }
     if (lat2+lon2 in this.points === false) {
-        console.log(lat2+lon2);
-        var geometry2 = new THREE.SphereGeometry( 0.2, 5, 5 );
-        var material2 = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-        var sphere2 = new THREE.Mesh( geometry2, material2 );
-        sphere2.position.copy(endPosition);
-        sphere2.name = lat2+lon2;
-        texlineGroup.add(sphere2);
+        console.log("POINT2" + lat2+lon2);
+        if (point) {
+            var geometry2 = new THREE.SphereGeometry( 0.2, 5, 5 );
+            var material2 = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+            var sphere2 = new THREE.Mesh( geometry2, material2 );
+            sphere2.position.copy(endPosition);
+            sphere2.name = lat2+lon2;
+            texlineGroup.add(sphere2);
+        }
         this.points[lat2+lon2] = {};
-        this.pointsInPath[pathName].push(lat1+lon1);
+        this.pointsInPath[pathName].push(lat2+lon2);
     }
     //create curve to get center of the line
     var calculateCurve = new THREE.LineCurve3(startPosition,endPosition);
@@ -108,34 +114,37 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
 
     console.log(points);
 
-    var geometryL = new THREE.BufferGeometry().setFromPoints( points );
 
-    var materialL = new THREE.LineBasicMaterial( { color : color } );
-    var curveObject = new THREE.Line( geometryL, materialL );
+    if (styleEnum === this.styleEnum.line) {
+        var geometryL = new THREE.BufferGeometry().setFromPoints( points );
+        var materialL = new THREE.LineBasicMaterial( { color : color } );
+        var curveObject = new THREE.Line( geometryL, materialL );
+        texlineGroup.add(curveObject);
+    }
+    if (styleEnum === this.styleEnum.point) {
+        for (var i = 0; i< 19;i++) {
+            var dotGeometry = new THREE.Geometry();
+            dotGeometry.vertices.push(new THREE.Vector3(points[i].x,points[i].y,points[i].z));
+            var dotMaterial = new THREE.PointsMaterial( { size: 4, sizeAttenuation: false, color: color } );
+            var dot = new THREE.Points( dotGeometry, dotMaterial );
+            texlineGroup.add( dot );
+        }
+    }
+    if (styleEnum=== this.styleEnum.sphere) {
+        for (var i = 0; i< 19;i++) {
+            var geometryS = new THREE.SphereGeometry( 0.1, 5, 5 );
 
-    //texlineGroup.add(curveObject);
-
-    // for (var i = 0; i< 19;i++) {
-    //     var geometryS = new THREE.SphereGeometry( 0.1, 5, 5 );
-    //
-    //     var materialS = new THREE.LineBasicMaterial( { color : color } );
-    //     var sphereLine =  new THREE.Mesh( geometryS, materialS );
-    //     sphereLine.position.set(points[i].x,points[i].y,points[i].z);
-    //     texlineGroup.add(sphereLine);
-    // }
-
-    for (var i = 0; i< 19;i++) {
-        var dotGeometry = new THREE.Geometry();
-        dotGeometry.vertices.push(new THREE.Vector3(points[i].x,points[i].y,points[i].z));
-        var dotMaterial = new THREE.PointsMaterial( { size: 4, sizeAttenuation: false, color: color } );
-        var dot = new THREE.Points( dotGeometry, dotMaterial );
-        texlineGroup.add( dot );
+            var materialS = new THREE.LineBasicMaterial( { color : color } );
+            var sphereLine =  new THREE.Mesh( geometryS, materialS );
+            sphereLine.position.set(points[i].x,points[i].y,points[i].z);
+            texlineGroup.add(sphereLine);
+        }
     }
 
     //NOTICE that objects are added to sphere and not to scene, maybe i the furure we will need update positions
 };
 
-LineGenerator.prototype.generateLines = function (path, color, text, point, zoom) {
+LineGenerator.prototype.generateLines = function (path, color, point, zoom, styleEnum) {
     var lastIndex = 0;
     for (var i = 0; i < path.addresses.length-1; i++) {
 
@@ -151,7 +160,7 @@ LineGenerator.prototype.generateLines = function (path, color, text, point, zoom
         if (curveLenght > CLUSTER_SIZE*zoom) {
             //console.log(array[i]);
             this.generateLine(path.addresses[lastIndex].lat,path.addresses[lastIndex].lng,
-                path.addresses[i+1].lat,path.addresses[i+1].lng,color,path.name);
+                path.addresses[i+1].lat,path.addresses[i+1].lng,color,path.name,point,styleEnum);
             lastIndex = i+1;
         }
         else {
@@ -161,7 +170,7 @@ LineGenerator.prototype.generateLines = function (path, color, text, point, zoom
     if (lastIndex !== path.addresses.length-1) {
         console.log("drawing the last line");
         this.generateLine(path.addresses[lastIndex].lat,path.addresses[lastIndex].lng,
-            path.addresses[path.addresses.length-1].lat,path.addresses[path.addresses.length-1].lng,color,path.name);
+            path.addresses[path.addresses.length-1].lat,path.addresses[path.addresses.length-1].lng,
+            color,path.name, point, styleEnum);
     }
-    //todo check if lastIndex was used, if no write the last line
 };
