@@ -6,6 +6,9 @@ var geos = {};
 function Main() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    this.clock = new THREE.Clock();
+    this.clockCounter = 0;
+    this.cameraZoomOld = 1;
     this.cameraZoom = 1;
     this.renderer = new THREE.WebGLRenderer();
     this.lineGenerator = new LineGenerator(radiusSize,this.scene);
@@ -205,6 +208,17 @@ Main.prototype.keyboardControll = function () {
     }
 };
 
+Main.prototype.dataRefresh = function (deltaTime) {
+    this.clockCounter += deltaTime;
+    if (this.clockCounter >= 3){
+        this.clockCounter = 0;
+        if (this.cameraZoomOld !== this.cameraZoom) {
+            console.log("REFRESHING");
+            this.cameraZoomOld = this.cameraZoom;
+            this.controller.refreshAll();
+        }
+    }
+};
 Main.prototype.animate = function () {
     requestAnimationFrame( this.animate.bind(this));
     this.stats.begin();
@@ -213,6 +227,7 @@ Main.prototype.animate = function () {
 
     this.renderer.render(this.scene, this.camera);
     this.keyboardControll();
+    this.dataRefresh(this.clock.getDelta());
     this.stats.end();
 };
 

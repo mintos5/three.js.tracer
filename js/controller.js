@@ -218,6 +218,15 @@ Controller.prototype.removeAll = function (reloadChoices) {
 
 };
 
+Controller.prototype.refreshAll = function () {
+    //remove all and reload all lines
+    main.lineGenerator.removeAll();
+    var pathsValues = this.choicesPaths.getValue(true);
+    for (var j = 0; j < pathsValues.length; j++){
+        this.reloadLine(pathsValues[j]);
+    }
+};
+
 Controller.prototype.modifyLine = function (pathName, allPaths) {
     console.log("MODIFY" + pathName + " " + allPaths);
     if (allPaths) {
@@ -228,6 +237,8 @@ Controller.prototype.modifyLine = function (pathName, allPaths) {
         else {
             this.pointsEnabled = false;
         }
+
+
         //set all divs to the enableAll settings
         var select = document.getElementById("enableAllSelect").value;
         var color = document.getElementById("enableAllColor").value;
