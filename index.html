@@ -62,6 +62,29 @@
 
     <div id="select">
         <div id="buttonCorrect" style="text-align: center; margin-top: 10px">
+            <select id="selectGroup" name="enableAll">
+                <option value="all">All</option>
+                <option value="Argentina">Argentina</option>
+                <option value="Arizona">Arizona</option>
+                <option value="Australia">Australia</option>
+                <option value="Belgium">Belgium</option>
+                <option value="Brazil">Brazil</option>
+                <option value="California">California</option>
+                <option value="Canada">Canada</option>
+                <option value="Germany">Germany</option>
+                <option value="Chile">Chile</option>
+                <option value="India">India</option>
+                <option value="Indonesia">Indonesia</option>
+                <option value="Italy">Italy</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="NewYork">NewYork</option>
+                <option value="Pakistan">Pakistan</option>
+                <option value="Poland">Poland</option>
+                <option value="SouthAfrica">SouthAfrica</option>
+                <option value="Sweden">Sweden</option>
+                <option value="Thailand">Thailand</option>
+                <option value="UnitedKingdom">UnitedKingdom</option>
+            </select>
             <button id="selectAll" onclick="main.controller.addAll()">Select All</button>
             <button id="unSelectALl" onclick="main.controller.removeAll(true)">Unselect all</button>
         </div>
@@ -81,7 +104,7 @@
                     <option value="line">line</option>
                     <option value="point">point</option>
                     <option value="sphere">sphere</option>
-                </select><input id="enableAllColor" type="color" style="height: 20px; margin-left: 2px" value="#ffffff" oninput="main.controller.modifyLine('',true)"> Enable all<input type="checkbox" checked="true" id="pointsEnable" onclick="main.controller.modifyLine('',true)">POINTS</div>
+                </select><input id="enableAllColor" type="color" style="height: 20px; margin-left: 2px" value="#ffffff" oninput="main.controller.modifyLine('',true)"> Enable all<input type="checkbox" checked="true" id="pointsEnable" onclick="main.controller.modifyLine('',true)">Points<input type="checkbox" checked="true" id="refreshingEnabled">Refreshing</div>
 
         </div>
 

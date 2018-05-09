@@ -21,29 +21,6 @@ function Main() {
     this.canvasHeight;
 }
 
-//todo bublinky zmenit farbu
-//todo clustering urobit ho plynulo, asi vsetko prekreslovat
-//todo rekonfiguracia tvaru, dat prec text a namiesto neho toto
-//todo removing lines by one....
-//todo starting point, ending point
-
-//
-//3 scenare vizualnej analyzy>
-//3 use case, chce nieco na datach zistit....
-//najprv scenar az potom implementacia
-//
-//1. FILTROVANIE/PRIDANIE SI DAT Uzivatel si vie vybrat konkretny traceRoute a zobrazit si ho
-//2. Selekcia uzlov vyfiltrovat len cesty prechadzajuce tymto bodom
-//3. Detaily na pouziadanie, zapinat vypinat veci pre sprehladnenie, zobrazenie textu IP adresy zobrazenie bodov
-//4.
-//
-
-//klustrovanie rozne urove zoomu
-//rovnake ciary spajat
-//namiesto ciar pouzivat 3d valec /tvar ciary
-//selekcia a detail na poziadanie mi davaju 4b staci aj viacej poklikat
-//V K3 dorobit vsetko
-
 Main.prototype.init = function () {
 
     this.onWindowResize();
@@ -63,7 +40,7 @@ Main.prototype.init = function () {
 
     this.stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
     //TO ENABLE/DISABLE performance panel
-    document.body.appendChild( this.stats.dom );
+    //document.body.appendChild( this.stats.dom );
 
     //generate sphere
     var geometry = new THREE.SphereGeometry( radiusSize, 50, 50 );
@@ -211,8 +188,9 @@ Main.prototype.keyboardControll = function () {
 Main.prototype.dataRefresh = function (deltaTime) {
     this.clockCounter += deltaTime;
     if (this.clockCounter >= 3){
+        var refreshingEnabled = document.getElementById("refreshingEnabled").checked;
         this.clockCounter = 0;
-        if (this.cameraZoomOld !== this.cameraZoom) {
+        if (refreshingEnabled && this.cameraZoomOld !== this.cameraZoom) {
             console.log("REFRESHING");
             this.cameraZoomOld = this.cameraZoom;
             this.controller.refreshAll();

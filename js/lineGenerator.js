@@ -40,8 +40,6 @@ LineGenerator.prototype.removeLine = function (pathName) {
 };
 
 LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, pathName, point, styleEnum) {
-
-    //todo add point/line/sphere enable
     //check if the path was created before
     var texlineGroup;
     if (pathName in this.groups === false) {
@@ -59,7 +57,6 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
     var endPosition = positionOnSphere(Number(lat2),Number(lon2),this.sphereRadius);
     //add this points to hashTable, to create it only once
     if (lat1+lon1 in this.points === false) {
-        console.log("POINT" + lat1+lon1);
         if (point) {
             var geometry1 = new THREE.SphereGeometry( 0.2, 5, 5 );
             var material1 = new THREE.MeshBasicMaterial( {color: 0xffff00} );
@@ -72,7 +69,6 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
         this.pointsInPath[pathName].push(lat1+lon1);
     }
     if (lat2+lon2 in this.points === false) {
-        console.log("POINT2" + lat2+lon2);
         if (point) {
             var geometry2 = new THREE.SphereGeometry( 0.2, 5, 5 );
             var material2 = new THREE.MeshBasicMaterial( {color: 0xffff00} );
@@ -100,7 +96,7 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
         middlePosition.copy(this.scene.worldToLocal(intersects[0].point));
         //move it litle above sphere
         var moveVector = new THREE.Vector3().copy(middlePosition);
-        moveVector.normalize().multiplyScalar(0.4*traceLenght);
+        moveVector.normalize().multiplyScalar(0.5*traceLenght);
         //add randomness to the middlePosition
         var randomVector = new THREE.Vector3(Math.random(),Math.random(),Math.random());
         middlePosition.add(randomVector);
@@ -114,9 +110,6 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
     //CREATE THE LINE
     //get three.js like
     var points = curve.getPoints( 18 );
-
-    console.log(points);
-
 
     if (styleEnum === this.styleEnum.line) {
         var geometryL = new THREE.BufferGeometry().setFromPoints( points );
@@ -157,8 +150,6 @@ LineGenerator.prototype.generateLines = function (path, color, point, zoom, styl
 
         var calculateCurve = new THREE.LineCurve3(startPosition,endPosition);
         var curveLenght = calculateCurve.getLength();
-        console.log("CLUSTERING");
-        console.log(curveLenght + " " + CLUSTER_SIZE*zoom);
 
         if (curveLenght > CLUSTER_SIZE*zoom) {
             //console.log(array[i]);
@@ -167,11 +158,11 @@ LineGenerator.prototype.generateLines = function (path, color, point, zoom, styl
             lastIndex = i+1;
         }
         else {
-            console.log("Skipping this line");
+            //console.log("Skipping this line");
         }
     }
     if (lastIndex !== path.addresses.length-1) {
-        console.log("drawing the last line");
+        //console.log("drawing the last line");
         this.generateLine(path.addresses[lastIndex].lat,path.addresses[lastIndex].lng,
             path.addresses[path.addresses.length-1].lat,path.addresses[path.addresses.length-1].lng,
             color,path.name, point, styleEnum);

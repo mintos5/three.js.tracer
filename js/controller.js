@@ -89,7 +89,7 @@ Controller.prototype.compareAndRemove = function (element,elementLocation,isGeos
 };
 
 Controller.prototype.addLine = function (pathName) {
-    console.log(pathName);
+    //console.log("Adding path: " + pathName);
     //add options
     var select = document.createElement("select");
     select.type = "select";
@@ -135,11 +135,23 @@ Controller.prototype.addLine = function (pathName) {
 };
 
 Controller.prototype.addAll = function () {
-    console.log("ADD ALL");
     //add everything from paths
-
-    for (var key in paths) {
-        this.choicesPaths.setValueByChoice(key);
+    var selectElement = document.getElementById("selectGroup");
+    var selectValue = selectElement.value;
+    console.log(selectValue);
+    if (selectValue === "all"){
+        for (var key in paths) {
+            this.choicesPaths.setValueByChoice(key);
+        }
+    }
+    else {
+        for (var key in paths) {
+            console.log(key + " " +selectValue);
+            if (key.indexOf(selectValue) !== -1) {
+                console.log("found it");
+                this.choicesPaths.setValueByChoice(key);
+            }
+        }
     }
 };
 
@@ -205,7 +217,13 @@ Controller.prototype.removeAll = function (reloadChoices) {
     checkbox1.onclick = function (ev) {
         main.controller.modifyLine("",true);
     };
-    var text1 = document.createTextNode('POINTS');
+    var text1 = document.createTextNode('Points');
+
+    var checkbox2 = document.createElement("input");
+    checkbox2.type = "checkbox";
+    checkbox2.id = "refreshingEnabled";
+    checkbox2.checked = true;
+    var text2 = document.createTextNode('Refreshing');
 
     var parentDiv = document.createElement("div");
     //add created div to the select div
@@ -215,6 +233,8 @@ Controller.prototype.removeAll = function (reloadChoices) {
     parentDiv.appendChild(label);
     parentDiv.appendChild(checkbox1);
     parentDiv.appendChild(text1);
+    parentDiv.appendChild(checkbox2);
+    parentDiv.appendChild(text2);
 
 };
 
@@ -336,14 +356,12 @@ Controller.prototype.loadChoices = function () {
         arrayPaths.push({value: key3, label:key3});
     }
     this.choicesPaths.setChoices(arrayPaths,'value','label', true);
-    console.log(arrayPaths);
 
     //IP loading
     var arrayIps = [];
     for (var key4 in addresses) {
         arrayIps.push({value: key4, label:key4});
     }
-    console.log(arrayIps);
     this.choicesIps.setChoices(arrayIps,'value','label', true);
 
     //GEO loading
@@ -351,7 +369,6 @@ Controller.prototype.loadChoices = function () {
     for (var key5 in geos) {
         arrayGeos.push({value: key5, label:geos[key5].lat + " " +geos[key5].lat});
     }
-    console.log(arrayGeos);
     this.choicesGeos.setChoices(arrayGeos,'value','label', true);
 };
 
