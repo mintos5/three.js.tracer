@@ -356,50 +356,51 @@ Controller.prototype.loadChoices = function () {
 };
 
 Controller.prototype.selectionCreate = function (geoInfo) {
-    //todo check if the div is created
     console.log(geoInfo);
     var selectFloat = document.getElementById("selectFloat");
     selectFloat.style.display = "block";
 
 
-    var selectFloatText = document.getElementById("selectFloatText");
+    var selectFloatForm = document.getElementById("selectFloatForm");
 
     var h31 = document.createElement("h3");
     h31.innerText = "GEO";
-    selectFloatText.appendChild(h31);
+    selectFloatForm.appendChild(h31);
 
     var checkbox1 = document.createElement("input");
     checkbox1.type = "checkbox";
-    checkbox1.id = geoInfo;
-    selectFloatText.appendChild(checkbox1);
+    checkbox1.name = "geo";
+    checkbox1.value = geoInfo;
+    selectFloatForm.appendChild(checkbox1);
 
     var text1 = document.createTextNode(geos[geoInfo].lat + " " + geos[geoInfo].lng);
-    selectFloatText.appendChild(text1);
+    selectFloatForm.appendChild(text1);
 
     var h32 = document.createElement("h3");
     h32.innerText = "IP";
-    selectFloatText.appendChild(h32);
+    selectFloatForm.appendChild(h32);
 
     for (var i =0; i < geos[geoInfo].arrayIps.length; i++) {
         var checkbox2 = document.createElement("input");
         checkbox2.type = "checkbox";
-        checkbox2.id = geos[geoInfo].arrayIps[i].ip;
-        selectFloatText.appendChild(checkbox2);
+        checkbox2.name = "ip";
+        checkbox2.value = geos[geoInfo].arrayIps[i].ip;
+        selectFloatForm.appendChild(checkbox2);
         var text2 = document.createTextNode(geos[geoInfo].arrayIps[i].name + " " + geos[geoInfo].arrayIps[i].ip);
-        selectFloatText.appendChild(text2);
+        selectFloatForm.appendChild(text2);
         var newLine = document.createElement("br");
-        selectFloatText.appendChild(newLine);
+        selectFloatForm.appendChild(newLine);
     }
 
     var line = document.createElement("hr");
-    selectFloatText.appendChild(line);
+    selectFloatForm.appendChild(line);
 };
 
 Controller.prototype.selectionClose = function () {
     //remove all old childs of div
-    var selectFloatText = document.getElementById("selectFloatText");
-    while (selectFloatText.firstChild) {
-        selectFloatText.removeChild(selectFloatText.firstChild);
+    var selectFloatForm = document.getElementById("selectFloatForm");
+    while (selectFloatForm.firstChild) {
+        selectFloatForm.removeChild(selectFloatForm.firstChild);
     }
     //dont display the parent div
     var selectFloat = document.getElementById("selectFloat");
@@ -407,6 +408,22 @@ Controller.prototype.selectionClose = function () {
 };
 
 Controller.prototype.selection = function () {
-    //todo check if the div is created
+    //go through all checkboxes
+    this.removeAll(true);
+
+    var ipCheckBoxes = document.getElementsByName("ip");
+    var geoCheckBoxes =  document.getElementsByName("geo");
+    for (var i=0; i < ipCheckBoxes.length; i++) {
+        if (ipCheckBoxes[i].checked) {
+            this.choicesIps.setValueByChoice(ipCheckBoxes[i].value);
+        }
+    }
+    for (var j=0; j < geoCheckBoxes.length;j++) {
+        if (geoCheckBoxes[j].checked) {
+            this.choicesGeos.setValueByChoice(geoCheckBoxes[j].value)
+        }
+    }
+
+
     this.selectionClose();
 };

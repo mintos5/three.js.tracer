@@ -100,7 +100,10 @@ LineGenerator.prototype.generateLine = function (lat1, lon1, lat2, lon2, color, 
         middlePosition.copy(this.scene.worldToLocal(intersects[0].point));
         //move it litle above sphere
         var moveVector = new THREE.Vector3().copy(middlePosition);
-        moveVector.normalize().multiplyScalar(0.6*traceLenght);
+        moveVector.normalize().multiplyScalar(0.4*traceLenght);
+        //add randomness to the middlePosition
+        var randomVector = new THREE.Vector3(Math.random(),Math.random(),Math.random());
+        middlePosition.add(randomVector);
         middlePosition.add(moveVector);
     }
     var curve = new THREE.QuadraticBezierCurve3(
